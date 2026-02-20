@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EveryStudent — Teacher Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f7;--surface:#ffffff;--surface2:#f7f8fc;--border:#e4e7ef;
+  --text:#0f172a;--text2:#64748b;--text3:#94a3b8;
+  --accent:#1a6cf5;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--purple:#8b5cf6;
+  --sidebar:#0f1729;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.14),0 2px 8px rgba(0,0,0,0.07);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:232px;background:var(--sidebar);flex-shrink:0;display:flex;flex-direction:column;height:100vh;position:relative;overflow:hidden}
+.sidebar::before{content:'';position:absolute;top:-60px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(26,108,245,0.18) 0%,transparent 70%);pointer-events:none}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1a6cf5,#0ea5e9);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.sidebar-section{padding:20px 12px 8px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.25);letter-spacing:1.2px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;margin:1px 8px;cursor:pointer;transition:all 0.15s;color:rgba(255,255,255,0.45);font-size:13px;font-weight:500}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8)}
+.nav-item.active{background:rgba(26,108,245,0.25);color:#fff;font-weight:600}
+.nav-item .nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,0.06)}
+.user-row{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#e2e8f0}
+.user-role{font-size:11px;color:rgba(255,255,255,0.3)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;gap:16px;flex-shrink:0;position:relative;z-index:50}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text3);margin-left:4px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;position:relative}
+.tb-btn:hover{background:var(--surface2);border-color:var(--accent)}
+
+/* Search bar */
+.search-bar{position:relative;display:flex;align-items:center}
+.search-bar input{background:#f1f5f9;border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 34px;font-size:13px;color:var(--text);width:240px;outline:none;font-family:inherit;transition:all 0.15s}
+.search-bar input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(26,108,245,0.1);width:280px}
+.search-bar input::placeholder{color:#94a3b8}
+.search-icon{position:absolute;left:10px;color:#94a3b8;pointer-events:none}
+.search-results-dropdown{position:absolute;top:42px;left:0;width:300px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);z-index:300;overflow:hidden;display:none}
+.search-results-dropdown.open{display:block}
+.search-result-item{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.12s;border-bottom:1px solid #f1f5f9}
+.search-result-item:last-child{border-bottom:none}
+.search-result-item:hover{background:#f8faff}
+.search-result-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.search-no-results{padding:16px;text-align:center;color:#94a3b8;font-size:13px}
+
+/* BELL */
+.bell-btn{width:40px;height:40px;border-radius:10px;border:none;background:#dc2626;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;position:relative;box-shadow:0 0 0 0 rgba(220,38,38,0.4);animation:bell-ring 2.5s infinite}
+.bell-btn:hover{background:#b91c1c;transform:scale(1.05)}
+@keyframes bell-ring{0%,90%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.4)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+.bell-count{position:absolute;top:-6px;right:-6px;background:#fff;color:#dc2626;font-size:9px;font-weight:900;padding:1px 5px;border-radius:10px;border:2px solid #dc2626;line-height:1.4;min-width:18px;text-align:center}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6cf5,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;border:2px solid transparent;transition:border-color 0.15s}
+.avatar-btn:hover{border-color:var(--accent)}
+
+/* NOTIFICATION DROPDOWN */
+.notif-dropdown{position:absolute;top:56px;right:56px;width:375px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);z-index:200;overflow:hidden;display:none}
+.notif-dropdown.open{display:block;animation:fadeDown 0.2s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.notif-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.notif-header h3{font-size:14px;font-weight:700}
+.notif-clear{font-size:12px;color:var(--accent);cursor:pointer;font-weight:600}
+.notif-item{padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;display:flex;gap:12px;align-items:flex-start}
+.notif-item:hover{background:var(--surface2)}
+.notif-item.unread-red{background:#fff5f5}
+.notif-item.unread-red:hover{background:#fee2e2}
+.notif-item.unread-blue{background:#eff6ff}
+.notif-item.unread-blue:hover{background:#dbeafe}
+.notif-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-ico.warn{background:#fee2e2}
+.notif-ico.info{background:#eff6ff}
+.notif-ico.ok{background:#d1fae5}
+.notif-body{flex:1}
+.notif-body strong{font-size:13px;font-weight:700;color:var(--text);display:block;margin-bottom:2px}
+.notif-body span{font-size:12px;color:var(--text2);line-height:1.5}
+.notif-time{font-size:11px;color:var(--text3);margin-top:3px;display:block}
+
+/* PAGE VIEWS */
+.page{display:none;flex:1;overflow-y:auto;padding:28px}
+.page.active{display:block}
+
+/* ── HOME PAGE ── */
+.home-welcome{margin-bottom:28px}
+.home-welcome h1{font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px}
+.home-welcome p{font-size:14px;color:var(--text2)}
+.alert-banner{background:linear-gradient(135deg,#fee2e2,#fff5f5);border:1.5px solid #fca5a5;border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.15s}
+.alert-banner:hover{box-shadow:0 4px 20px rgba(239,68,68,0.15);transform:translateY(-1px)}
+.alert-banner-icon{font-size:24px;flex-shrink:0}
+.alert-banner-text h3{font-size:14px;font-weight:800;color:#dc2626;margin-bottom:2px}
+.alert-banner-text p{font-size:13px;color:#ef4444}
+.alert-banner-arrow{margin-left:auto;font-size:18px;color:#dc2626;font-weight:900}
+.classes-section h2{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px}
+.classes-section p{font-size:13px;color:var(--text2);margin-bottom:16px}
+.classes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.class-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:22px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.class-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--accent)}
+.class-card.has-alert{border-color:#fca5a5}
+.class-card.has-alert:hover{border-color:#ef4444}
+.class-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0}
+.class-card.color-blue::before{background:linear-gradient(90deg,#1a6cf5,#0ea5e9)}
+.class-card.color-green::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.class-card.color-purple::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.class-card.color-orange::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.class-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.class-code{font-size:12px;font-weight:800;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase}
+.class-alert-badge{background:#fee2e2;color:#dc2626;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;animation:pulse-badge 2s infinite}
+@keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:0.7}}
+.class-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.3}
+.class-semester{font-size:12px;color:var(--text3);margin-bottom:14px}
+.class-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.class-stat{background:var(--surface2);border-radius:8px;padding:8px 10px}
+.class-stat-val{font-size:16px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace}
+.class-stat-lbl{font-size:10px;color:var(--text3);margin-top:1px}
+.class-cta{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;color:var(--accent)}
+
+/* ── CLASS INTRO PAGE ── */
+.class-intro-header{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;padding:8px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);transition:all 0.15s;margin-bottom:20px;width:fit-content}
+.back-btn:hover{background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.class-intro-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.class-intro-sub{font-size:14px;color:var(--text2)}
+.class-intro-badge{background:linear-gradient(135deg,#1a6cf5,#0ea5e9);color:#fff;font-size:12px;font-weight:800;padding:6px 14px;border-radius:20px}
+.alert-cards-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.alert-card{border-radius:14px;padding:20px;border:1.5px solid;cursor:pointer;transition:all 0.15s}
+.alert-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.alert-card.urgent{background:linear-gradient(135deg,#fff5f5,#fff);border-color:#fca5a5}
+.alert-card.warning{background:linear-gradient(135deg,#fff7ed,#fff);border-color:#fdba74}
+.alert-card-icon{font-size:24px;margin-bottom:8px}
+.alert-card-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px}
+.alert-card-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.alert-card-action{font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px}
+.students-preview{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+.students-preview h3{font-size:14px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.students-list{display:flex;flex-direction:column;gap:0}
+.student-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background 0.12s;border-radius:8px;padding:10px 8px;margin:0 -8px}
+.student-row:hover{background:#f8faff}
+.student-row:last-child{border-bottom:none}
+.student-av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.student-name{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.student-id{font-size:11px;color:var(--text3)}
+.student-score{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+.student-risk{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.view-analytics-cta{background:linear-gradient(135deg,#1a6cf5,#0ea5e9);border-radius:14px;padding:24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.15s}
+.view-analytics-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(26,108,245,0.3)}
+.view-analytics-cta h3{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px}
+.view-analytics-cta p{font-size:13px;color:rgba(255,255,255,0.75)}
+.cta-arrow-btn{background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);color:#fff;font-size:14px;font-weight:900;padding:12px 22px;border-radius:12px;cursor:pointer;transition:all 0.15s}
+.cta-arrow-btn:hover{background:rgba(255,255,255,0.3)}
+
+/* CONTENT (analytics page) */
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:box-shadow 0.2s}
+.kpi-card:hover{box-shadow:var(--shadow-lg)}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.kpi-card.blue::after{background:linear-gradient(90deg,#1a6cf5,#0ea5e9)}
+.kpi-card.green::after{background:linear-gradient(90deg,#10b981,#34d399)}
+.kpi-card.orange::after{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.kpi-card.purple::after{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.kpi-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.kpi-val{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--text)}
+.kpi-sub{font-size:12px;color:var(--text2);margin-top:4px;display:flex;align-items:center;gap:4px}
+.kpi-trend{font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px}
+.kpi-trend.up{background:#d1fae5;color:#059669}
+.kpi-trend.down{background:#fee2e2;color:#dc2626}
+.kpi-trend.flat{background:#f1f5f9;color:#64748b}
+.kpi-sparkline{position:absolute;bottom:0;right:0;width:80px;height:40px;opacity:0.15}
+
+/* GRID */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.dash-grid.wide{grid-template-columns:2fr 1fr}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.card-title-action{font-size:12px;color:var(--accent);cursor:pointer;font-weight:600;text-transform:none;letter-spacing:0}
+
+/* BAR */
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:var(--text2);width:110px;flex-shrink:0}
+.bar-track{flex:1;background:#f1f5f9;border-radius:4px;height:10px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-pct{font-size:12px;font-weight:600;width:36px;text-align:right;font-family:'JetBrains Mono',monospace}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:var(--text)}
+.data-table tr:hover td{background:#f8faff}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.pill.green{background:#d1fae5;color:#059669}
+.pill.yellow{background:#fef3c7;color:#b45309}
+.pill.red{background:#fee2e2;color:#dc2626}
+.pill.blue{background:#dbeafe;color:#1d4ed8}
+
+/* LEGEND */
+.legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* HEATMAP */
+.heatmap-scroll{width:100%;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.heatmap-scroll::-webkit-scrollbar{height:4px}
+.heatmap-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+.heatmap-inner{display:inline-block;min-width:740px;width:100%}
+.heat-cell{border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer;height:20px;transition:transform 0.12s,box-shadow 0.12s;position:relative}
+.heat-cell:hover{transform:scale(1.22);z-index:20;box-shadow:0 3px 10px rgba(0,0,0,0.2)}
+.heat-row-urgent{outline:2.5px solid #fbbf24;outline-offset:1px;border-radius:6px;background:rgba(251,191,36,0.08)}
+
+/* Tooltip */
+.heat-tooltip{position:fixed;background:#0f172a;color:#e2e8f0;font-size:12px;border-radius:11px;padding:11px 14px;box-shadow:0 8px 28px rgba(0,0,0,0.28);pointer-events:none;z-index:9999;min-width:190px;max-width:260px;opacity:0;transition:opacity 0.15s;line-height:1.6}
+.heat-tooltip.show{opacity:1}
+
+/* FEED */
+.feed{display:flex;flex-direction:column;gap:12px}
+.feed-item{display:flex;gap:12px;align-items:flex-start}
+.feed-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.feed-text{font-size:13px;color:var(--text);font-weight:500;line-height:1.4}
+.feed-time{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* RIGHT STACK */
+.right-stack{display:flex;flex-direction:column;gap:18px;min-width:0}
+
+/* ═══ HISTORY PAGE ═══ */
+.history-header{margin-bottom:24px}
+.history-header h1{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.history-header p{font-size:14px;color:var(--text2)}
+.year-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.year-tab{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);transition:all 0.15s}
+.year-tab:hover{border-color:var(--accent);color:var(--accent)}
+.year-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.history-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.trend-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.trend-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:16px}
+.trend-line-container{position:relative;padding:0 0 20px}
+.trend-svg{width:100%;overflow:visible}
+.timeline-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.timeline-row{display:flex;gap:0;position:relative;padding-left:20px;margin-bottom:0}
+.timeline-row::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{padding:14px 0 14px 20px;position:relative;flex:1;border-bottom:1px solid #f1f5f9}
+.timeline-item:last-child{border-bottom:none}
+.timeline-dot{position:absolute;left:-14px;top:18px;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);z-index:1}
+.timeline-year{font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px}
+.timeline-avg{font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.timeline-detail{font-size:11px;color:var(--text2);line-height:1.5}
+.compare-table{width:100%;border-collapse:collapse;font-size:13px}
+.compare-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;border-bottom:2px solid var(--border);background:#f8fafc}
+.compare-table td{padding:10px 14px;border-bottom:1px solid #f1f5f9}
+.compare-table tr:hover td{background:#f8faff}
+.trend-arrow.up{color:#10b981}
+.trend-arrow.down{color:#ef4444}
+.trend-arrow.flat{color:#f59e0b}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.modal{background:#fff;border-radius:20px;width:1000px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.2);overflow:hidden;animation:slideUp 0.25s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#f8faff,#fff);flex-shrink:0}
+.modal-title{font-size:17px;font-weight:800;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text2);transition:all 0.15s}
+.modal-close:hover{background:#f1f5f9}
+.modal-body{flex:1;overflow-y:auto;padding:22px 24px}
+.modal-tabs{display:flex;gap:6px;margin-bottom:18px}
+.modal-tab{padding:7px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all 0.15s}
+.modal-tab.active-blue{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-tab.tab-red{border-color:#fca5a5;color:#dc2626;background:#fff5f5}
+.modal-tab.tab-red.active-red{background:#dc2626;color:#fff;border-color:#dc2626}
+.modal-kpi-row{display:grid;gap:12px;margin-bottom:20px}
+.m-kpi{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:all 0.15s}
+.m-kpi.clickable{cursor:pointer}
+.m-kpi.clickable:hover{box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.m-kpi.alert-kpi{background:#fff5f5;border-color:#fca5a5;cursor:pointer}
+.m-kpi.alert-kpi:hover{border-color:#ef4444;box-shadow:0 4px 16px rgba(239,68,68,0.15)}
+.m-kpi-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px}
+.m-kpi-val{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.m-kpi-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.modal-section-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.scatter-svg{width:100%;overflow:visible}
+@keyframes alert-glow{0%,100%{filter:drop-shadow(0 0 4px #ef4444)}50%{filter:drop-shadow(0 0 14px #ef4444)}}
+.alert-pt{animation:alert-glow 2s infinite;cursor:pointer}
+@keyframes alert-pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+/* AT-RISK */
+.stu-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:18px}
+.stu-hdr{padding:16px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border)}
+.stu-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0}
+.stu-bd{padding:16px 20px}
+.mini-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.mini-lbl{font-size:11px;color:var(--text2);width:96px;flex-shrink:0}
+.mini-trk{flex:1;background:#f1f5f9;border-radius:3px;height:7px;overflow:hidden}
+.mini-fill{height:100%;border-radius:3px}
+.mini-pct{font-size:11px;font-weight:700;width:32px;text-align:right;font-family:'JetBrains Mono',monospace}
+.found-chip{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;border:1.5px solid}
+.stu-msg-btn{border:1px solid var(--border);background:#fff;color:#1a6cf5;font-size:12px;font-weight:800;padding:7px 12px;border-radius:12px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.stu-msg-btn:hover{background:#eff6ff;border-color:#93c5fd;transform:translateY(-1px)}
+
+/* Q2 POPUP */
+.student-popup{position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center}
+.student-popup.open{display:flex;animation:fadeIn 0.2s ease}
+.sp-modal{background:#fff;border-radius:20px;width:900px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 32px 100px rgba(0,0,0,0.25);overflow:hidden;animation:slideUp 0.25s cubic-bezier(.4,0,.2,1)}
+.sp-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#fff5f5,#fff);position:relative;flex-shrink:0}
+.sp-badge{display:inline-flex;align-items:center;gap:6px;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.sp-body{flex:1;overflow-y:auto;padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.wrong-table{font-size:12px;width:100%}
+.wrong-table th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border)}
+.wrong-table td{padding:8px 10px;border-bottom:1px solid #f8fafc;vertical-align:top}
+.wrong-table tr:hover td{background:#fff5f5}
+.wrong-ans{font-family:'JetBrains Mono',monospace;color:#dc2626;font-size:11px}
+
+/* GEMINI */
+.gem-panel{background:linear-gradient(135deg,#f8f0ff,#fff);border:1px solid #e9d5ff;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.gem-hdr{display:flex;align-items:center;gap:10px}
+.gem-logo{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#1a6cf5);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.gem-name{font-size:13px;font-weight:700;color:#4c1d95}
+.gem-model{font-size:11px;color:#7c3aed;background:#f3e8ff;padding:2px 8px;border-radius:20px;font-weight:600}
+.gem-sec{font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px}
+.gem-box{background:#f5f3ff;border-left:3px solid #8b5cf6;border-radius:0 8px 8px 0;padding:9px 11px;font-size:12px;color:#1e293b;line-height:1.6;margin-bottom:5px}
+.gem-rec{background:#eff6ff;border-left:3px solid #1a6cf5;border-radius:0 8px 8px 0;padding:9px 11px;font-size:12px;color:#1e293b;line-height:1.6;margin-bottom:5px}
+.gem-chip{display:inline-block;background:#f3e8ff;color:#6d28d9;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;margin:2px}
+.cursor{display:inline-block;width:2px;height:13px;background:#8b5cf6;margin-left:2px;animation:blink .8s infinite;vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* CHAT */
+.chat-fab{position:fixed;right:22px;bottom:22px;width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,#1a6cf5,#0ea5e9);box-shadow:0 18px 46px rgba(26,108,245,0.28),0 6px 18px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:900;transition:transform 0.15s}
+.chat-fab:hover{transform:scale(1.05)}
+.chat-tray{position:fixed;right:22px;bottom:86px;width:310px;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;z-index:901;display:none}
+.chat-tray.open{display:block;animation:fadeUp 0.18s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.chat-tray-hdr{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#f8faff,#fff)}
+.chat-tray-hdr strong{font-size:13px}
+.chat-tray-close{cursor:pointer;color:#94a3b8;font-weight:900}
+.chat-thread{padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background 0.12s}
+.chat-thread:hover{background:#f8fafc}
+.chat-thread:last-child{border-bottom:none}
+.chat-av{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0;background:linear-gradient(135deg,#6366f1,#8b5cf6)}
+.chat-thread-body{flex:1;min-width:0}
+.chat-thread-name{font-size:13px;font-weight:800;color:#0f172a}
+.chat-thread-preview{font-size:12px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.chat-thread-meta{font-size:11px;color:#94a3b8;font-family:'JetBrains Mono',monospace}
+.chat-window{position:fixed;right:22px;bottom:86px;width:410px;height:560px;background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,0.22);z-index:902;display:none;flex-direction:column;overflow:hidden}
+.chat-window.open{display:flex;animation:slideUp 0.2s ease}
+.chat-hdr{padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#f8faff,#fff);display:flex;align-items:center;gap:10px}
+.chat-hdr .chat-av{width:34px;height:34px;border-radius:12px}
+.chat-hdr-title{flex:1;min-width:0}
+.chat-hdr-title .name{font-size:13px;font-weight:900;color:#0f172a}
+.chat-hdr-title .sub{font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-hdr-x{width:30px;height:30px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;color:#64748b;font-weight:900;display:flex;align-items:center;justify-content:center}
+.chat-hdr-x:hover{background:#f1f5f9}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 14px 6px;background:linear-gradient(#fff,#fbfcff)}
+.msg-row{display:flex;margin-bottom:10px}
+.msg-row.teacher{justify-content:flex-end}
+.msg-row.student{justify-content:flex-start}
+.msg-bubble{max-width:78%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.45;box-shadow:0 1px 2px rgba(0,0,0,0.06);word-wrap:break-word}
+.msg-bubble.teacher{background:#1a6cf5;color:#fff;border-bottom-right-radius:6px}
+.msg-bubble.student{background:#f1f5f9;color:#0f172a;border-bottom-left-radius:6px}
+.msg-bubble.teacher a{color:#dbeafe;text-decoration:underline}
+.msg-meta{font-size:11px;color:#94a3b8;font-style:italic;margin-top:4px}
+.chat-compose{padding:12px 12px 14px;border-top:1px solid var(--border);background:#fff}
+.chat-compose textarea{width:100%;min-height:110px;max-height:160px;resize:none;border:1px solid #e2e8f0;border-radius:14px;padding:10px 11px;font-size:13px;outline:none;line-height:1.5;font-family:inherit}
+.chat-compose textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(147,197,253,0.35)}
+.chat-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
+.send-btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;transition:transform 0.12s,filter 0.12s}
+.send-btn:hover{filter:brightness(0.95);transform:translateY(-1px)}
+.small-hint{font-size:11px;color:#94a3b8;margin-top:8px}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo"><div class="logo-mark"><div class="logo-icon">🎓</div><div><div class="logo-text">EveryStudent</div><div class="logo-sub">Teacher Portal</div></div></div></div>
+  <div class="sidebar-section">Main</div>
+  <div class="nav-item active" id="nav-home" onclick="showPage('home')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1 7v8h5v-5h4v5h5V7L8 1z"/></svg>My Classes
+  </div>
+  <div class="nav-item" id="nav-analytics" onclick="showPage('analytics')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/></svg>Analytics
+  </div>
+  <div class="nav-item" id="nav-history" onclick="showPage('history')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>Class History
+  </div>
+  <div class="nav-item" id="nav-gradebook">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h6"/></svg>Gradebook
+  </div>
+  <div class="nav-item" id="nav-students">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>Students
+  </div>
+  <div class="sidebar-section">Tools</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/></svg>Upload PDFs
+  </div>
+  <div class="sidebar-bottom"><div class="user-row"><div class="user-avatar">MR</div><div><div class="user-name">Dr. Maria Rodriguez</div><div class="user-role">ROB 501 · Fall 2024</div></div></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div><span class="topbar-title" id="topbar-title">My Classes</span><span class="topbar-sub" id="topbar-sub">· Fall 2024</span></div>
+
+    <!-- SEARCH BAR -->
+    <div style="margin-left:20px" class="search-bar">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#94a3b8" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l2.5 2.5"/></svg>
+      <input type="text" id="searchInput" placeholder="Search students..." autocomplete="off" oninput="handleSearch(this.value)" onfocus="handleSearch(this.value)"/>
+      <div class="search-results-dropdown" id="searchDropdown">
+        <div id="searchResultsList"></div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="bell-btn" id="bellBtn" onclick="toggleNotif(event)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M8 2a4 4 0 00-4 4v3L2.5 11.5h11L12 9V6a4 4 0 00-4-4z"/><path d="M6.5 13a1.5 1.5 0 003 0"/></svg>
+        <div class="bell-count">4</div>
+      </div>
+      <div class="avatar-btn">MR</div>
+    </div>
+
+    <!-- NOTIFICATION DROPDOWN -->
+    <div class="notif-dropdown" id="notifDropdown">
+      <div class="notif-header"><h3>Notifications</h3><span class="notif-clear">Mark all read</span></div>
+      <div class="notif-item unread-red" onclick="showPage('classintro')">
+        <div class="notif-ico warn">⚠️</div>
+        <div class="notif-body">
+          <strong>Midterm Exam · Attention Required</strong>
+          <span>35 of 38 students missed Q2 on the rotation matrix exam. AI flagged common error pattern.</span>
+          <span class="notif-time">2 hours ago · ROB 501</span>
+        </div>
+      </div>
+      <div class="notif-item unread-red" onclick="showPage('analytics');setTimeout(()=>switchTab('risk'),200)">
+        <div class="notif-ico warn">🚨</div>
+        <div class="notif-body">
+          <strong>2 Students at Critical Risk</strong>
+          <span>Felix Novak (34% avg) and Derek Liu (38% avg) are in danger of failing.</span>
+          <span class="notif-time">3 hours ago · ROB 501</span>
+        </div>
+      </div>
+      <div class="notif-item unread-blue">
+        <div class="notif-ico info">📥</div>
+        <div class="notif-body">
+          <strong>HW 4 Submissions Complete</strong>
+          <span>All 38 students submitted. Average 78.3%. AI grading in progress.</span>
+          <span class="notif-time">5 hours ago</span>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-ico ok">✅</div>
+        <div class="notif-body">
+          <strong>Quiz 3 Grading Finalized</strong>
+          <span>Grades published. Class average 83%. 3 students below threshold.</span>
+          <span class="notif-time">Yesterday</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ HOME PAGE ═══════════ -->
+  <div class="page active" id="page-home" style="padding:28px;overflow-y:auto">
+    <div class="home-welcome">
+      <h1>Good morning, Dr. Rodriguez 👋</h1>
+      <p>Here's a summary of your classes for Fall 2024. Click on any class to see details.</p>
+    </div>
+
+    <!-- Urgent alert banner -->
+    <div class="alert-banner" onclick="showPage('classintro')">
+      <div class="alert-banner-icon">🚨</div>
+      <div class="alert-banner-text">
+        <h3>Action Required — ROB 501 Math for Robotics</h3>
+        <p>2 students are at critical risk of failing. 35 students missed Q2 on the midterm exam. Tap to review.</p>
+      </div>
+      <div class="alert-banner-arrow">→</div>
+    </div>
+
+    <div class="classes-section">
+      <h2>Your Classes</h2>
+      <p>Select a class to view details, student performance, and analytics.</p>
+    </div>
+
+    <div style="height:14px"></div>
+
+    <div class="classes-grid">
+      <!-- ROB 501 — the main class with alerts -->
+      <div class="class-card color-blue has-alert" onclick="showPage('classintro')">
+        <div class="class-card-header">
+          <div class="class-code">ROB 501</div>
+          <div class="class-alert-badge">⚠ 2 Alerts</div>
+        </div>
+        <div class="class-name">Math for Robotics</div>
+        <div class="class-semester">Fall 2024 · MWF 10:00–11:00am</div>
+        <div class="class-stats">
+          <div class="class-stat"><div class="class-stat-val">38</div><div class="class-stat-lbl">Students</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#f59e0b">74%</div><div class="class-stat-lbl">Class Avg</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#ef4444">2</div><div class="class-stat-lbl">At Risk</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#10b981">100%</div><div class="class-stat-lbl">Submitted</div></div>
+        </div>
+        <div class="class-cta">View Class Details <span>→</span></div>
+      </div>
+
+      <!-- Other classes (greyed / upcoming) -->
+      <div class="class-card color-green" style="opacity:0.7">
+        <div class="class-card-header"><div class="class-code">ROB 301</div><span style="font-size:11px;color:#10b981;font-weight:700;background:#d1fae5;padding:2px 8px;border-radius:20px">All Good</span></div>
+        <div class="class-name">Introduction to Robotics</div>
+        <div class="class-semester">Fall 2024 · TTh 1:00–2:30pm</div>
+        <div class="class-stats">
+          <div class="class-stat"><div class="class-stat-val">24</div><div class="class-stat-lbl">Students</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#10b981">86%</div><div class="class-stat-lbl">Class Avg</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#10b981">0</div><div class="class-stat-lbl">At Risk</div></div>
+          <div class="class-stat"><div class="class-stat-val">98%</div><div class="class-stat-lbl">Submitted</div></div>
+        </div>
+        <div class="class-cta" style="color:#10b981">View Class Details <span>→</span></div>
+      </div>
+
+      <div class="class-card color-purple" style="opacity:0.7">
+        <div class="class-card-header"><div class="class-code">ROB 601</div><span style="font-size:11px;color:#8b5cf6;font-weight:700;background:#f3e8ff;padding:2px 8px;border-radius:20px">Grad</span></div>
+        <div class="class-name">Advanced Control Systems</div>
+        <div class="class-semester">Fall 2024 · MW 3:00–4:30pm</div>
+        <div class="class-stats">
+          <div class="class-stat"><div class="class-stat-val">12</div><div class="class-stat-lbl">Students</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#10b981">88%</div><div class="class-stat-lbl">Class Avg</div></div>
+          <div class="class-stat"><div class="class-stat-val" style="color:#10b981">0</div><div class="class-stat-lbl">At Risk</div></div>
+          <div class="class-stat"><div class="class-stat-val">100%</div><div class="class-stat-lbl">Submitted</div></div>
+        </div>
+        <div class="class-cta" style="color:#8b5cf6">View Class Details <span>→</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CLASS INTRO PAGE ═══════════ -->
+  <div class="page" id="page-classintro" style="padding:28px;overflow-y:auto">
+    <div class="back-btn" onclick="showPage('home')">← Back to My Classes</div>
+
+    <div class="class-intro-header">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px">ROB 501 · Fall 2024</div>
+        <div class="class-intro-title">Math for Robotics</div>
+        <div class="class-intro-sub">MWF 10:00–11:00am · 38 Students Enrolled</div>
+      </div>
+      <div class="class-intro-badge">Fall 2024</div>
+    </div>
+
+    <!-- Alert cards -->
+    <div class="alert-cards-row">
+      <div class="alert-card urgent" onclick="showPage('analytics');setTimeout(()=>switchTab('risk'),200)">
+        <div class="alert-card-icon">🚨</div>
+        <div class="alert-card-title">2 Students Need Attention</div>
+        <div class="alert-card-desc">Felix Novak (34% avg) and Derek Liu (38% avg) are at critical risk of failing the course. Immediate intervention recommended.</div>
+        <div class="alert-card-action" style="color:#dc2626">See student details <span>→</span></div>
+      </div>
+      <div class="alert-card warning" onclick="openExamModal()">
+        <div class="alert-card-icon">⚠️</div>
+        <div class="alert-card-title">Midterm Exam — Review Needed</div>
+        <div class="alert-card-desc">35 out of 38 students answered Q2 incorrectly (Rotation Matrix). This is a class-wide pattern worth addressing before the final.</div>
+        <div class="alert-card-action" style="color:#f97316">View exam analysis <span>→</span></div>
+      </div>
+    </div>
+
+    <!-- Students list preview -->
+    <div class="students-preview">
+      <h3>Class Roster <span style="font-size:12px;color:var(--accent);cursor:pointer;font-weight:600;text-transform:none" onclick="showPage('analytics')">View all analytics →</span></h3>
+      <div class="students-list">
+        <div class="student-row">
+          <div class="student-av" style="background:linear-gradient(135deg,#10b981,#34d399)">EP</div>
+          <div><div class="student-name">Emma Patel</div><div class="student-id">ID: S001</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="student-score" style="color:#10b981">98%</div><div class="student-risk pill green">On Track</div></div>
+        </div>
+        <div class="student-row">
+          <div class="student-av" style="background:linear-gradient(135deg,#1a6cf5,#0ea5e9)">AJ</div>
+          <div><div class="student-name">Alice Johnson</div><div class="student-id">ID: S002</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="student-score" style="color:#10b981">92%</div><div class="student-risk pill green">On Track</div></div>
+        </div>
+        <div class="student-row">
+          <div class="student-av" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa)">GW</div>
+          <div><div class="student-name">Grace Wu</div><div class="student-id">ID: S003</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="student-score" style="color:#1a6cf5">84%</div><div class="student-risk pill blue">Good</div></div>
+        </div>
+        <div class="student-row" style="background:#fff7ed;border-radius:10px">
+          <div class="student-av" style="background:linear-gradient(135deg,#fdba74,#f97316)">DL</div>
+          <div><div class="student-name">Derek Liu</div><div class="student-id">ID: S004</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="student-score" style="color:#f97316">38%</div><div class="student-risk pill yellow">High Risk</div></div>
+        </div>
+        <div class="student-row" style="background:#fff5f5;border-radius:10px">
+          <div class="student-av" style="background:linear-gradient(135deg,#fca5a5,#ef4444)">FN</div>
+          <div><div class="student-name">Felix Novak</div><div class="student-id">ID: S006</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="student-score" style="color:#ef4444">34%</div><div class="student-risk pill red">Critical</div></div>
+        </div>
+        <div class="student-row">
+          <div class="student-av" style="background:linear-gradient(135deg,#6366f1,#818cf8)">BO</div>
+          <div><div class="student-name">Brian Okafor</div><div class="student-id">ID: S005</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="student-score" style="color:#10b981">79%</div><div class="student-risk pill green">On Track</div></div>
+        </div>
+        <div style="padding:10px 8px;color:#94a3b8;font-size:12px;text-align:center">+ 32 more students</div>
+      </div>
+    </div>
+
+    <!-- Big CTA to analytics -->
+    <div class="view-analytics-cta" onclick="showPage('analytics')">
+      <div>
+        <h3>📊 Open Full Analytics Dashboard</h3>
+        <p>View heatmaps, grade distributions, topic mastery, and student performance in detail.</p>
+      </div>
+      <button class="cta-arrow-btn">Open Analytics →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ ANALYTICS PAGE ═══════════ -->
+  <div class="page" id="page-analytics">
+    <div class="content">
+      <div class="back-btn" onclick="showPage('classintro')">← Back to ROB 501 Overview</div>
+
+      <!-- KPI ROW -->
+      <div class="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-label">Class Average</div><div class="kpi-val">74.2<span style="font-size:18px;font-weight:600;color:#64748b">%</span></div>
+          <div class="kpi-sub"><span class="kpi-trend up">↑ 3.1%</span> vs last exam</div>
+          <svg class="kpi-sparkline" viewBox="0 0 80 40"><polyline points="0,35 10,28 20,30 30,22 40,25 50,15 60,18 70,10 80,12" fill="none" stroke="#1a6cf5" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Submissions</div><div class="kpi-val">38<span style="font-size:18px;font-weight:600;color:#64748b">/38</span></div>
+          <div class="kpi-sub"><span class="kpi-trend up">100%</span> on time</div>
+          <svg class="kpi-sparkline" viewBox="0 0 80 40"><polyline points="0,38 10,36 20,34 30,32 40,28 50,24 60,20 70,16 80,10" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-label">At Risk Students</div><div class="kpi-val" style="color:#f59e0b">6</div>
+          <div class="kpi-sub"><span class="kpi-trend down">↑ 2</span> from last week</div>
+          <svg class="kpi-sparkline" viewBox="0 0 80 40"><polyline points="0,30 10,28 20,25 30,22 40,26 50,30 60,28 70,32 80,35" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-label">Current Avg GPA</div>
+          <div class="kpi-val">2.86<span style="font-size:18px;font-weight:600;color:#64748b">/4.0</span></div>
+          <div class="kpi-sub"><span class="kpi-trend flat">est.</span> based on exam average</div>
+          <svg class="kpi-sparkline" viewBox="0 0 80 40"><polyline points="0,30 10,28 20,26 30,20 40,18 50,16 60,14 70,12 80,10" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="dash-grid wide" style="margin-bottom:18px">
+        <div class="card">
+          <div class="card-title">Topic Mastery · Midterm Exam <span class="card-title-action" onclick="openExamModal()">View full report →</span></div>
+          <div class="bar-chart">
+            <div class="bar-row"><div class="bar-label">Determinants</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="bar-pct" style="color:#10b981">88%</div></div>
+            <div class="bar-row"><div class="bar-label">Integration</div><div class="bar-track"><div class="bar-fill" style="width:81%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="bar-pct" style="color:#10b981">81%</div></div>
+            <div class="bar-row"><div class="bar-label">Matrix Addition</div><div class="bar-track"><div class="bar-fill" style="width:76%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="bar-pct" style="color:#10b981">76%</div></div>
+            <div class="bar-row"><div class="bar-label">Product Rule</div><div class="bar-track"><div class="bar-fill" style="width:63%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="bar-pct" style="color:#f59e0b">63%</div></div>
+            <div class="bar-row"><div class="bar-label">Chain Rule</div><div class="bar-track"><div class="bar-fill" style="width:51%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="bar-pct" style="color:#f59e0b">51%</div></div>
+            <div class="bar-row"><div class="bar-label" style="color:#dc2626;font-weight:700">⚠ Rotation Matrix</div><div class="bar-track"><div class="bar-fill" style="width:29%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div><div class="bar-pct" style="color:#ef4444">29%</div></div>
+            <div class="bar-row"><div class="bar-label">Eigenvalues</div><div class="bar-track"><div class="bar-fill" style="width:22%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div><div class="bar-pct" style="color:#ef4444">22%</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Grade Distribution</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <svg viewBox="0 0 120 120" width="130" height="130">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#10b981" stroke-width="20" stroke-dasharray="49.5 228" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#1a6cf5" stroke-width="20" stroke-dasharray="80 228" stroke-dashoffset="-49.5" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#8b5cf6" stroke-width="20" stroke-dasharray="77 228" stroke-dashoffset="-129.5" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#f59e0b" stroke-width="20" stroke-dasharray="36 228" stroke-dashoffset="-206.5" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#ef4444" stroke-width="20" stroke-dasharray="33 228" stroke-dashoffset="-242.5" transform="rotate(-90 60 60)"/>
+              <text x="60" y="57" text-anchor="middle" font-size="16" font-weight="800" fill="#0f172a">74.2%</text>
+              <text x="60" y="69" text-anchor="middle" font-size="8" fill="#94a3b8">avg score</text>
+            </svg>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;width:100%">
+              <div class="legend-row"><div class="legend-dot" style="background:#10b981"></div>A (90–100) · 7</div>
+              <div class="legend-row"><div class="legend-dot" style="background:#1a6cf5"></div>B (80–89) · 11</div>
+              <div class="legend-row"><div class="legend-dot" style="background:#8b5cf6"></div>C (70–79) · 11</div>
+              <div class="legend-row"><div class="legend-dot" style="background:#f59e0b"></div>D (60–69) · 5</div>
+              <div class="legend-row"><div class="legend-dot" style="background:#ef4444"></div>F (&lt; 60) · 4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3 — Heatmap + Right stack -->
+      <div class="dash-grid wide" style="margin-bottom:18px">
+        <div class="card" style="min-width:0;overflow:hidden">
+          <div class="card-title" style="margin-bottom:8px">
+            Student × Topic Heatmap
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:10px;color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0">hover for detail</span>
+              <span style="background:#fef3c7;border:1.5px solid #fbbf24;color:#b45309;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;text-transform:none;letter-spacing:0">⚠ Yellow = Urgent Row</span>
+            </div>
+          </div>
+          <div class="heatmap-scroll">
+            <div class="heatmap-inner" id="heatmapRoot"></div>
+          </div>
+        </div>
+
+        <div class="right-stack">
+          <div class="card">
+            <div class="card-title">Recent Assignments <span class="card-title-action">View all →</span></div>
+            <table class="data-table">
+              <thead><tr><th>Assignment</th><th>Avg</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Midterm Exam</strong><div style="font-size:11px;color:#94a3b8">Oct 28 · 10 Qs</div></td><td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#f59e0b">74.2%</span></td><td><span class="pill yellow">Review ⚠</span></td></tr>
+                <tr><td><strong>Quiz 3 · Derivatives</strong><div style="font-size:11px;color:#94a3b8">Oct 18 · 4 Qs</div></td><td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#10b981">83.1%</span></td><td><span class="pill green">Published</span></td></tr>
+                <tr><td><strong>Homework 4</strong><div style="font-size:11px;color:#94a3b8">Oct 14 · 6 Qs</div></td><td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#10b981">78.3%</span></td><td><span class="pill blue">AI Grading</span></td></tr>
+                <tr><td><strong>Quiz 2 · Integration</strong><div style="font-size:11px;color:#94a3b8">Oct 4 · 4 Qs</div></td><td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#10b981">81.0%</span></td><td><span class="pill green">Published</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-title">Activity Feed</div>
+            <div class="feed">
+              <div class="feed-item"><div class="feed-dot" style="background:#ef4444"></div><div><div class="feed-text">⚠ AI flagged <strong>Q2</strong> on Midterm — 92% error rate</div><div class="feed-time">2h ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#dc2626"></div><div><div class="feed-text">🚨 <strong>Felix Novak</strong> & <strong>Derek Liu</strong> — critical risk</div><div class="feed-time">3h ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#8b5cf6"></div><div><div class="feed-text">AI completed grading for <strong>38 midterm exams</strong></div><div class="feed-time">4h ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#10b981"></div><div><div class="feed-text">Quiz 3 grades published to all 38 students</div><div class="feed-time">2 days ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#1a6cf5"></div><div><div class="feed-text">HW 4 submissions deadline — 100% turnout</div><div class="feed-time">3 days ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#10b981"></div><div><div class="feed-text"><strong>Emma Patel</strong> — 98% on Quiz 3, top of class</div><div class="feed-time">4 days ago</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ HISTORY PAGE ═══════════ -->
+  <div class="page" id="page-history" style="padding:28px;overflow-y:auto">
+    <div class="history-header">
+      <h1>📅 Class History</h1>
+      <p>ROB 501 — Math for Robotics · Performance trends across all semesters</p>
+    </div>
+
+    <!-- Year tabs -->
+    <div class="year-tabs">
+      <div class="year-tab active" onclick="switchYearTab(this,'all')">All Years</div>
+      <div class="year-tab" onclick="switchYearTab(this,'2024')">Fall 2024</div>
+      <div class="year-tab" onclick="switchYearTab(this,'2023')">Fall 2023</div>
+      <div class="year-tab" onclick="switchYearTab(this,'2022')">Fall 2022</div>
+      <div class="year-tab" onclick="switchYearTab(this,'2021')">Fall 2021</div>
+    </div>
+
+    <!-- History KPIs -->
+    <div class="history-kpi-row">
+      <div class="kpi-card blue">
+        <div class="kpi-label">4-Year Avg</div>
+        <div class="kpi-val">77.4<span style="font-size:18px;color:#64748b">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend down">↓ 2.8%</span> this year vs 4yr avg</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Best Year</div>
+        <div class="kpi-val">82.1<span style="font-size:18px;color:#64748b">%</span></div>
+        <div class="kpi-sub">Fall 2022 · 31 students</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">Hardest Topic</div>
+        <div class="kpi-val" style="font-size:16px;font-weight:800">Eigenvalues</div>
+        <div class="kpi-sub">Avg 24% across all years</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Total Students</div>
+        <div class="kpi-val">143</div>
+        <div class="kpi-sub">Across 4 semesters</div>
+      </div>
+    </div>
+
+    <!-- Big trend chart -->
+    <div class="trend-card" style="margin-bottom:18px">
+      <div class="trend-title">Class Average Over Time</div>
+      <div style="position:relative;height:160px;padding:10px 0 30px">
+        <svg viewBox="0 0 700 130" style="width:100%;height:100%" preserveAspectRatio="none">
+          <!-- Grid -->
+          <line x1="0" y1="0" x2="700" y2="0" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="32" x2="700" y2="32" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="65" x2="700" y2="65" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="97" x2="700" y2="97" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="130" x2="700" y2="130" stroke="#e4e7ef" stroke-width="1"/>
+          <!-- Labels Y -->
+          <text x="2" y="4" font-size="9" fill="#94a3b8">100%</text>
+          <text x="2" y="36" font-size="9" fill="#94a3b8">90%</text>
+          <text x="2" y="69" font-size="9" fill="#94a3b8">80%</text>
+          <text x="2" y="101" font-size="9" fill="#94a3b8">70%</text>
+          <!-- Filled area -->
+          <path d="M80,54 C130,50 180,44 220,36 C260,28 300,32 340,38 C380,44 420,30 480,20 C530,12 580,28 640,58 L640,130 L80,130 Z" fill="rgba(26,108,245,0.08)"/>
+          <!-- Line -->
+          <polyline points="80,54 220,36 340,38 480,20 640,58" fill="none" stroke="#1a6cf5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Points -->
+          <circle cx="80" cy="54" r="5" fill="#1a6cf5" stroke="#fff" stroke-width="2"/>
+          <circle cx="220" cy="36" r="5" fill="#1a6cf5" stroke="#fff" stroke-width="2"/>
+          <circle cx="340" cy="38" r="5" fill="#10b981" stroke="#fff" stroke-width="2"/>
+          <circle cx="480" cy="20" r="6" fill="#10b981" stroke="#fff" stroke-width="2"/>
+          <circle cx="640" cy="58" r="6" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+          <!-- Value labels -->
+          <text x="80" y="48" text-anchor="middle" font-size="9" font-weight="800" fill="#1a6cf5">74.1</text>
+          <text x="220" y="30" text-anchor="middle" font-size="9" font-weight="800" fill="#1a6cf5">79.4</text>
+          <text x="340" y="32" text-anchor="middle" font-size="9" font-weight="800" fill="#10b981">78.8</text>
+          <text x="480" y="14" text-anchor="middle" font-size="9" font-weight="800" fill="#10b981">82.1</text>
+          <text x="640" y="52" text-anchor="middle" font-size="9" font-weight="800" fill="#f59e0b">74.2</text>
+          <!-- X Labels -->
+          <text x="80" y="125" text-anchor="middle" font-size="9" fill="#64748b">Sp 2021</text>
+          <text x="220" y="125" text-anchor="middle" font-size="9" fill="#64748b">Fa 2021</text>
+          <text x="340" y="125" text-anchor="middle" font-size="9" fill="#64748b">Fa 2022</text>
+          <text x="480" y="125" text-anchor="middle" font-size="9" fill="#64748b">Fa 2023</text>
+          <text x="640" y="125" text-anchor="middle" font-size="9" font-weight="800" fill="#f59e0b">Fa 2024 ★</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Side-by-side timeline + topic trends -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+
+      <!-- Per-year summary cards -->
+      <div class="timeline-section">
+        <div class="trend-title" style="margin-bottom:16px">Per-Semester Snapshot</div>
+        <div class="timeline-row" style="flex-direction:column">
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#f59e0b"></div>
+            <div class="timeline-year">Fall 2024 · Current</div>
+            <div class="timeline-avg" style="color:#f59e0b">74.2%</div>
+            <div class="timeline-detail">38 students · 2 at critical risk · Q2 Rotation Matrix flagged class-wide</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#10b981"></div>
+            <div class="timeline-year">Fall 2023</div>
+            <div class="timeline-avg" style="color:#10b981">82.1%</div>
+            <div class="timeline-detail">35 students · 0 critical risk · Best performing cohort · Eigenvalues still weak</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#1a6cf5"></div>
+            <div class="timeline-year">Fall 2022</div>
+            <div class="timeline-avg" style="color:#1a6cf5">78.8%</div>
+            <div class="timeline-detail">31 students · 1 at risk · First year rotation matrix was taught in new format</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#8b5cf6"></div>
+            <div class="timeline-year">Fall 2021</div>
+            <div class="timeline-avg" style="color:#8b5cf6">79.4%</div>
+            <div class="timeline-detail">39 students · 3 at risk · Pre-requisite enforcement introduced mid-year</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#64748b"></div>
+            <div class="timeline-year">Spring 2021</div>
+            <div class="timeline-avg" style="color:#64748b">74.1%</div>
+            <div class="timeline-detail">28 students · 4 at risk · Pandemic year, remote delivery, lower engagement</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Topic comparison across years -->
+      <div class="trend-card">
+        <div class="trend-title">Topic Avg Across Years</div>
+        <div class="bar-chart" style="gap:8px">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span>Determinants</span><span style="font-family:'JetBrains Mono',monospace">88% → 91% → 93% → 90%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:90%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span>Integration</span><span style="font-family:'JetBrains Mono',monospace">81% → 85% → 83% → 84%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:83%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span>Matrix Addition</span><span style="font-family:'JetBrains Mono',monospace">76% → 80% → 79% → 82%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:79%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span>Product Rule</span><span style="font-family:'JetBrains Mono',monospace">63% → 70% → 68% → 72%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:68%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span>Chain Rule</span><span style="font-family:'JetBrains Mono',monospace">51% → 62% → 59% → 66%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:59%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span style="color:#dc2626;font-weight:700">⚠ Rotation Matrix</span><span style="font-family:'JetBrains Mono',monospace;color:#dc2626">29% → 38% → 35% → 42%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:36%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:4px"><span style="color:#dc2626;font-weight:700">⚠ Eigenvalues</span><span style="font-family:'JetBrains Mono',monospace;color:#dc2626">22% → 28% → 25% → 30%</span></div>
+            <div class="bar-track" style="height:8px"><div class="bar-fill" style="width:26%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:#64748b;line-height:1.5">
+          💡 <strong>Pattern:</strong> Rotation Matrix and Eigenvalues have been consistently weak across all 5 semesters. Consider a dedicated review session earlier in the semester.
+        </div>
+      </div>
+    </div>
+
+    <!-- Full comparison table -->
+    <div class="trend-card">
+      <div class="trend-title" style="margin-bottom:16px">Year-by-Year Comparison Table</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Semester</th>
+            <th>Students</th>
+            <th>Class Avg</th>
+            <th>A / B / C / D / F</th>
+            <th>At Risk</th>
+            <th>Weakest Topic</th>
+            <th>vs Prior Year</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fff9f0">
+            <td><strong>Fall 2024</strong> <span style="font-size:10px;background:#fef3c7;color:#b45309;padding:1px 6px;border-radius:10px;font-weight:700;margin-left:4px">Current</span></td>
+            <td>38</td>
+            <td><span style="font-family:'JetBrains Mono',monospace;font-weight:800;color:#f59e0b">74.2%</span></td>
+            <td style="font-size:11px;font-family:'JetBrains Mono',monospace">7 / 11 / 11 / 5 / 4</td>
+            <td><span class="pill red">2 critical</span></td>
+            <td style="color:#dc2626;font-size:12px">Rotation Matrix (29%)</td>
+            <td><span class="trend-arrow down">↓ 7.9%</span></td>
+          </tr>
+          <tr>
+            <td><strong>Fall 2023</strong></td>
+            <td>35</td>
+            <td><span style="font-family:'JetBrains Mono',monospace;font-weight:800;color:#10b981">82.1%</span></td>
+            <td style="font-size:11px;font-family:'JetBrains Mono',monospace">12 / 10 / 9 / 3 / 1</td>
+            <td><span class="pill green">None</span></td>
+            <td style="color:#dc2626;font-size:12px">Eigenvalues (28%)</td>
+            <td><span class="trend-arrow up">↑ 3.3%</span></td>
+          </tr>
+          <tr>
+            <td><strong>Fall 2022</strong></td>
+            <td>31</td>
+            <td><span style="font-family:'JetBrains Mono',monospace;font-weight:800;color:#1a6cf5">78.8%</span></td>
+            <td style="font-size:11px;font-family:'JetBrains Mono',monospace">8 / 10 / 8 / 3 / 2</td>
+            <td><span class="pill yellow">1</span></td>
+            <td style="color:#dc2626;font-size:12px">Rotation Matrix (35%)</td>
+            <td><span class="trend-arrow down">↓ 0.6%</span></td>
+          </tr>
+          <tr>
+            <td><strong>Fall 2021</strong></td>
+            <td>39</td>
+            <td><span style="font-family:'JetBrains Mono',monospace;font-weight:800;color:#8b5cf6">79.4%</span></td>
+            <td style="font-size:11px;font-family:'JetBrains Mono',monospace">11 / 12 / 9 / 4 / 3</td>
+            <td><span class="pill yellow">3</span></td>
+            <td style="color:#dc2626;font-size:12px">Eigenvalues (30%)</td>
+            <td><span class="trend-arrow up">↑ 5.3%</span></td>
+          </tr>
+          <tr>
+            <td><strong>Spring 2021</strong></td>
+            <td>28</td>
+            <td><span style="font-family:'JetBrains Mono',monospace;font-weight:800;color:#64748b">74.1%</span></td>
+            <td style="font-size:11px;font-family:'JetBrains Mono',monospace">5 / 8 / 8 / 4 / 3</td>
+            <td><span class="pill red">4</span></td>
+            <td style="color:#dc2626;font-size:12px">Rotation Matrix (22%)</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══════════ EXAM MODAL ═══════════ -->
+<div class="modal-overlay" id="examModal" onclick="closeExamModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div><div class="modal-title">📊 Midterm Exam — Full Analysis</div><div class="modal-sub">ROB 501 Math for Robotics · Oct 28, 2024 · 38 students · 10 questions</div></div>
+      <button class="modal-close" onclick="closeExamModalBtn()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <div class="modal-tab active-blue" id="tabExam" onclick="switchTab('exam')">📊 Exam Overview</div>
+        <div class="modal-tab tab-red" id="tabRisk" onclick="switchTab('risk')">
+          🚨 Students Need Attention
+          <span style="background:#dc2626;color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:6px">2</span>
+        </div>
+      </div>
+
+      <div id="examPanel">
+        <div class="modal-kpi-row" style="grid-template-columns:repeat(5,1fr)">
+          <div class="m-kpi"><div class="m-kpi-label">Class Average</div><div class="m-kpi-val" style="color:#f59e0b">74.2%</div><div class="m-kpi-sub">below 80% target</div></div>
+          <div class="m-kpi"><div class="m-kpi-label">Highest Score</div><div class="m-kpi-val" style="color:#10b981">98%</div><div class="m-kpi-sub">Emma Patel</div></div>
+          <div class="m-kpi"><div class="m-kpi-label">Lowest Score</div><div class="m-kpi-val" style="color:#ef4444">30%</div><div class="m-kpi-sub">Felix Novak</div></div>
+          <div class="m-kpi"><div class="m-kpi-label">Critical Issues</div><div class="m-kpi-val" style="color:#ef4444">1 ⚠</div><div class="m-kpi-sub">Q2 · 92% error rate</div></div>
+          <div class="m-kpi alert-kpi" onclick="switchTab('risk')">
+            <div class="m-kpi-label" style="color:#dc2626">Students Need Attention</div>
+            <div class="m-kpi-val" style="color:#dc2626;font-size:24px">2 🚨</div>
+            <div class="m-kpi-sub" style="color:#ef4444;font-size:10px">Felix Novak · Derek Liu → click</div>
+          </div>
+        </div>
+        <div class="modal-section-title">📉 Wrong Answer Distribution per Question</div>
+        <div id="distContainer" style="background:#f8fafc;border-radius:14px;padding:18px 18px 14px;margin-bottom:20px;border:1px solid #e4e7ef"></div>
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section-title">🎯 Score Distribution</div>
+            <div style="background:#f8fafc;border-radius:14px;padding:14px;border:1px solid #e4e7ef">
+              <svg id="scatterSvg" viewBox="0 0 340 180" class="scatter-svg">
+                <line x1="40" y1="10" x2="40" y2="160" stroke="#e4e7ef" stroke-width="1"/>
+                <line x1="40" y1="160" x2="330" y2="160" stroke="#e4e7ef" stroke-width="1"/>
+                <line x1="40" y1="10" x2="330" y2="10" stroke="#f1f5f9" stroke-width="0.5" stroke-dasharray="3"/>
+                <line x1="40" y1="55" x2="330" y2="55" stroke="#f1f5f9" stroke-width="0.5" stroke-dasharray="3"/>
+                <line x1="40" y1="110" x2="330" y2="110" stroke="#f1f5f9" stroke-width="0.5" stroke-dasharray="3"/>
+                <text x="35" y="13" text-anchor="end" font-size="8" fill="#94a3b8">100%</text>
+                <text x="35" y="58" text-anchor="end" font-size="8" fill="#94a3b8">75%</text>
+                <text x="35" y="113" text-anchor="end" font-size="8" fill="#94a3b8">50%</text>
+                <text x="35" y="163" text-anchor="end" font-size="8" fill="#94a3b8">0%</text>
+                <text x="40" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">1</text><text x="69" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">2</text><text x="98" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">3</text><text x="127" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">4</text><text x="156" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">5</text><text x="185" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">6</text><text x="214" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">7</text><text x="243" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">8</text><text x="272" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">9</text><text x="301" y="172" text-anchor="middle" font-size="8" fill="#94a3b8">10</text>
+                <text x="185" y="182" text-anchor="middle" font-size="8" fill="#94a3b8">Question Number</text>
+                <g id="scatterPoints"></g>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div class="modal-section-title">📋 Question Summary</div>
+            <table class="data-table" style="font-size:12px">
+              <thead><tr><th>Q#</th><th>Topic</th><th>Correct</th><th></th></tr></thead>
+              <tbody id="qTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="riskPanel" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:14px 18px;background:#fff5f5;border:1.5px solid #fca5a5;border-radius:12px">
+          <span style="font-size:22px">🚨</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#dc2626">2 Students Require Immediate Intervention</div>
+            <div style="font-size:12px;color:#ef4444;margin-top:2px">Both students are below 40% course average with foundational gaps across multiple topics</div>
+          </div>
+        </div>
+        <div class="stu-card" style="border-color:#fca5a5">
+          <div class="stu-hdr" style="background:linear-gradient(135deg,#fff5f5,#fff)">
+            <div class="stu-av" style="background:linear-gradient(135deg,#fee2e2,#fca5a5);color:#dc2626">FN</div>
+            <div style="flex:1"><div style="font-size:16px;font-weight:800">Felix Novak</div><div style="font-size:12px;color:#64748b;margin-top:2px">ID: S006 · ROB 501 · Fall 2024</div></div>
+            <button class="stu-msg-btn" onclick="openChat('Felix Novak')">💬 Message</button>
+            <div style="text-align:right;margin-right:12px"><div style="font-size:28px;font-weight:900;color:#ef4444;font-family:'JetBrains Mono',monospace;line-height:1">34%</div><div style="font-size:11px;color:#94a3b8">course avg</div></div>
+            <span class="pill red" style="font-size:12px;padding:5px 13px">Critical Risk</span>
+          </div>
+          <div class="stu-bd">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:9px">Assessment Scores</div>
+                <div class="mini-row"><div class="mini-lbl">HW 1</div><div class="mini-trk"><div class="mini-fill" style="width:33%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">33%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Quiz 1</div><div class="mini-trk"><div class="mini-fill" style="width:30%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">30%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Midterm</div><div class="mini-trk"><div class="mini-fill" style="width:30%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">30%</div></div>
+                <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.7px;margin:11px 0 8px">Topic Mastery</div>
+                <div class="mini-row"><div class="mini-lbl">Matrix Addition</div><div class="mini-trk"><div class="mini-fill" style="width:60%;background:#f59e0b"></div></div><div class="mini-pct" style="color:#f59e0b">60%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Integration</div><div class="mini-trk"><div class="mini-fill" style="width:20%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">20%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Derivatives</div><div class="mini-trk"><div class="mini-fill" style="width:25%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">25%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Eigenvalues</div><div class="mini-trk"><div class="mini-fill" style="width:5%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">5%</div></div>
+              </div>
+              <div>
+                <div style="background:#fff5f5;border-radius:10px;padding:10px 12px;border-left:3px solid #ef4444;margin-top:20px">
+                  <div style="font-size:10px;font-weight:700;color:#dc2626;margin-bottom:4px">🤖 AI Recommendation</div>
+                  <div style="font-size:12px;color:#374151;line-height:1.6">Felix is confusing differentiation with integration and left 3 questions blank. Recommend immediate office hours + referral to Math tutoring center.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stu-card" style="border-color:#fdba74">
+          <div class="stu-hdr" style="background:linear-gradient(135deg,#fff7ed,#fff)">
+            <div class="stu-av" style="background:linear-gradient(135deg,#fed7aa,#fdba74);color:#c2410c">DL</div>
+            <div style="flex:1"><div style="font-size:16px;font-weight:800">Derek Liu</div><div style="font-size:12px;color:#64748b;margin-top:2px">ID: S004 · ROB 501 · Fall 2024</div></div>
+            <button class="stu-msg-btn" onclick="openChat('Derek Liu')">💬 Message</button>
+            <div style="text-align:right;margin-right:12px"><div style="font-size:28px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;line-height:1">38%</div><div style="font-size:11px;color:#94a3b8">course avg</div></div>
+            <span class="pill yellow" style="font-size:12px;padding:5px 13px">High Risk</span>
+          </div>
+          <div class="stu-bd">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:9px">Assessment Scores</div>
+                <div class="mini-row"><div class="mini-lbl">HW 1</div><div class="mini-trk"><div class="mini-fill" style="width:47%;background:#f97316"></div></div><div class="mini-pct" style="color:#f97316">47%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Quiz 1</div><div class="mini-trk"><div class="mini-fill" style="width:40%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">40%</div></div>
+                <div class="mini-row"><div class="mini-lbl">Midterm</div><div class="mini-trk"><div class="mini-fill" style="width:38%;background:#ef4444"></div></div><div class="mini-pct" style="color:#ef4444">38%</div></div>
+              </div>
+              <div>
+                <div style="background:#fff7ed;border-radius:10px;padding:10px 12px;border-left:3px solid #f97316;margin-top:20px">
+                  <div style="font-size:10px;font-weight:700;color:#c2410c;margin-bottom:4px">🤖 AI Recommendation</div>
+                  <div style="font-size:12px;color:#374151;line-height:1.6">Derek has a clear split: basic calculus is emerging but linear algebra is critically weak. Targeted linear algebra review recommended before the final.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q2 POPUP -->
+<div class="student-popup" id="studentPopup" onclick="closeStudentPopup(event)">
+  <div class="sp-modal" onclick="event.stopPropagation()">
+    <div class="sp-header">
+      <div class="sp-badge">⚠ Critical Issue Detected · Q2</div>
+      <div style="font-size:17px;font-weight:800;color:#0f172a;margin-bottom:4px">Question 2 — Rotation Matrix Sign Error</div>
+      <div style="font-size:13px;color:#64748b">35 of 38 students (92%) answered incorrectly · Midterm Exam · Oct 28, 2024</div>
+      <button class="modal-close" style="position:absolute;top:16px;right:20px" onclick="document.getElementById('studentPopup').classList.remove('open')">✕</button>
+    </div>
+    <div class="sp-body">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#f8fafc;border:1px solid #e4e7ef;border-radius:12px;padding:14px 16px">
+          <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px">Question 2 (10 pts)</div>
+          <div style="font-size:13px;color:#0f172a;line-height:1.6;margin-bottom:10px">Write the 2D rotation matrix R(θ) that rotates a vector counterclockwise by angle θ. Apply it to <strong>v = [1, 0]ᵀ</strong> with θ = 90°.</div>
+          <div style="background:#d1fae5;border-radius:8px;padding:9px 12px;font-size:12px;color:#065f46">
+            <strong>Correct Answer:</strong><br/>
+            <span style="font-family:'JetBrains Mono',monospace">R(θ) = [[cos θ, −sin θ], [sin θ, cos θ]]</span><br/>
+            <span style="font-family:'JetBrains Mono',monospace">R(90°)·[1,0]ᵀ = [0, 1]ᵀ</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px">Students Who Got It Wrong (35 / 38)</div>
+          <div style="max-height:250px;overflow-y:auto;border:1px solid #e4e7ef;border-radius:10px">
+            <table class="wrong-table">
+              <thead><tr><th>Student</th><th>Their Answer</th><th>Error</th></tr></thead>
+              <tbody>
+                <tr><td>Brian Okafor</td><td class="wrong-ans">[[cosθ, sinθ],[sinθ, cosθ]]</td><td style="color:#dc2626;font-size:11px">Missing − sign</td></tr>
+                <tr><td>Derek Liu</td><td class="wrong-ans">[[cosθ, sinθ],[−sinθ, cosθ]]</td><td style="color:#dc2626;font-size:11px">Signs flipped</td></tr>
+                <tr><td>Felix Novak</td><td class="wrong-ans">[[cosθ, sinθ],[sinθ, cosθ]]</td><td style="color:#dc2626;font-size:11px">Missing − sign</td></tr>
+                <tr><td>Carlos Vega</td><td class="wrong-ans">[[cosθ, sinθ],[−sinθ, cosθ]]</td><td style="color:#dc2626;font-size:11px">Row/col swapped</td></tr>
+                <tr><td>Priya Shah</td><td class="wrong-ans">[[cosθ, sinθ],[sinθ, cosθ]]</td><td style="color:#dc2626;font-size:11px">Missing − sign</td></tr>
+                <tr><td>Leo Martins</td><td class="wrong-ans">[[1, 0],[0, 1]]</td><td style="color:#dc2626;font-size:11px">Identity matrix</td></tr>
+                <tr><td style="color:#64748b;font-style:italic" colspan="3">+ 29 more with same pattern...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px">AI Analysis</div>
+        <div class="gem-panel">
+          <div class="gem-hdr"><div class="gem-logo">✦</div><div><div class="gem-name">Gemini for Education</div></div><div class="gem-model">gemini-2.0-flash</div></div>
+          <div><div class="gem-sec">🔍 Error Pattern</div><div class="gem-box"><strong>92% of students (35/38)</strong> omitted the negative sign at position (1,2). 29 of 35 share the identical wrong matrix — class-wide conceptual gap.</div></div>
+          <div><div class="gem-sec">🧠 Root Cause</div><div class="gem-box">Students are <strong>confusing the rotation matrix with its transpose</strong>. The geometric intuition behind the negative sign was not internalized.</div></div>
+          <div><div class="gem-sec">💡 Recommendations</div><div class="gem-rec"><strong>1.</strong> Re-derive R(θ) geometrically next class — show where each basis vector goes.</div><div class="gem-rec"><strong>2.</strong> Assign a makeup Q2 variant for partial credit recovery.</div></div>
+          <div style="font-size:11px;color:#a78bfa">✦ Generated by Gemini · 35 submissions analyzed<span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HEAT TOOLTIP -->
+<div class="heat-tooltip" id="heatTip"></div>
+
+<!-- CHAT FAB + TRAY + WINDOW -->
+<div class="chat-fab" id="chatFab" onclick="toggleChatTray()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+</div>
+<div class="chat-tray" id="chatTray">
+  <div class="chat-tray-hdr"><strong>Messages</strong><span class="chat-tray-close" onclick="closeChatTray()">✕</span></div>
+  <div id="chatTrayList"></div>
+</div>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-hdr">
+    <div class="chat-av" id="chatHdrAv">FN</div>
+    <div class="chat-hdr-title"><div class="name" id="chatHdrName">Felix Novak</div><div class="sub" id="chatHdrSub">ROB 501 · Student message thread</div></div>
+    <div class="chat-hdr-x" onclick="closeChatWindow()">✕</div>
+  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="chat-compose">
+    <textarea id="chatInput" placeholder="Write a message..."></textarea>
+    <div class="chat-actions"><button class="send-btn" onclick="sendChat()">Send</button></div>
+    <div class="small-hint">Tip: suggest a time for office hours.</div>
+  </div>
+</div>
+
+<script>
+// ─── STUDENTS DATA (for search) ───────────────────────
+const allStudents = [
+  {name:'Emma Patel',       id:'S001', avg:98, status:'On Track',   initials:'EP', color:'#10b981'},
+  {name:'Alice Johnson',    id:'S002', avg:92, status:'On Track',   initials:'AJ', color:'#1a6cf5'},
+  {name:'Grace Wu',         id:'S003', avg:84, status:'Good',       initials:'GW', color:'#8b5cf6'},
+  {name:'Derek Liu',        id:'S004', avg:38, status:'High Risk',  initials:'DL', color:'#f97316'},
+  {name:'Brian Okafor',     id:'S005', avg:79, status:'On Track',   initials:'BO', color:'#6366f1'},
+  {name:'Felix Novak',      id:'S006', avg:34, status:'Critical',   initials:'FN', color:'#ef4444'},
+  {name:'Hector Rosales',   id:'S007', avg:71, status:'On Track',   initials:'HR', color:'#0ea5e9'},
+  {name:'Carla Reyes',      id:'S008', avg:85, status:'Good',       initials:'CR', color:'#10b981'},
+  {name:'Jin Park',         id:'S009', avg:77, status:'On Track',   initials:'JP', color:'#8b5cf6'},
+  {name:'Sara Nielsen',     id:'S010', avg:82, status:'Good',       initials:'SN', color:'#1a6cf5'},
+  {name:'Carlos Vega',      id:'S011', avg:68, status:'Watch',      initials:'CV', color:'#f59e0b'},
+  {name:'Priya Shah',       id:'S012', avg:88, status:'Good',       initials:'PS', color:'#10b981'},
+  {name:'Leo Martins',      id:'S013', avg:55, status:'At Risk',    initials:'LM', color:'#f97316'},
+  {name:'Aisha Kamara',     id:'S014', avg:91, status:'On Track',   initials:'AK', color:'#10b981'},
+  {name:'Marcus Tran',      id:'S015', avg:74, status:'On Track',   initials:'MT', color:'#1a6cf5'},
+];
+
+// ─── SEARCH ───────────────────────────────────────────
+function handleSearch(val) {
+  const dropdown = document.getElementById('searchDropdown');
+  const list = document.getElementById('searchResultsList');
+  const query = val.trim().toLowerCase();
+  
+  if (!query) {
+    dropdown.classList.remove('open');
+    return;
+  }
+  
+  const results = allStudents.filter(s => s.name.toLowerCase().includes(query) || s.id.toLowerCase().includes(query));
+  dropdown.classList.add('open');
+  
+  if (results.length === 0) {
+    list.innerHTML = `<div class="search-no-results">No students found for "${val}"</div>`;
+    return;
+  }
+  
+  list.innerHTML = results.map(s => {
+    const statusColor = s.status === 'Critical' ? '#ef4444' : s.status === 'High Risk' ? '#f97316' : s.status === 'At Risk' ? '#f97316' : s.status === 'Watch' ? '#f59e0b' : '#10b981';
+    const statusBg = s.status === 'Critical' ? '#fee2e2' : s.status === 'High Risk' || s.status === 'At Risk' ? '#fff7ed' : s.status === 'Watch' ? '#fef3c7' : '#d1fae5';
+    return `<div class="search-result-item" onclick="document.getElementById('searchInput').value='${s.name}';document.getElementById('searchDropdown').classList.remove('open')">
+      <div class="search-result-avatar" style="background:${s.color}">${s.initials}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#0f172a">${s.name}</div>
+        <div style="font-size:11px;color:#94a3b8">ID: ${s.id} · ROB 501</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${statusColor}">${s.avg}%</div>
+        <div style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:${statusBg};color:${statusColor}">${s.status}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.addEventListener('click', (e) => {
+  const sb = document.querySelector('.search-bar');
+  if (sb && !sb.contains(e.target)) {
+    document.getElementById('searchDropdown').classList.remove('open');
+  }
+});
+
+// ─── PAGE NAVIGATION ──────────────────────────────────
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  // Show target
+  const target = document.getElementById('page-' + pageId);
+  if (target) target.classList.add('active');
+  
+  // Update nav
+  const navMap = {home:'nav-home', analytics:'nav-analytics', classintro:'nav-analytics', history:'nav-history'};
+  const navEl = document.getElementById(navMap[pageId]);
+  if (navEl) navEl.classList.add('active');
+  
+  // Update topbar
+  const titles = {
+    home: ['My Classes','· Fall 2024'],
+    classintro: ['ROB 501 — Math for Robotics','· Class Overview'],
+    analytics: ['ROB 501 Analytics','· Fall 2024'],
+    history: ['Class History','· ROB 501 All Years']
+  };
+  const t = titles[pageId] || ['EduLens',''];
+  document.getElementById('topbar-title').textContent = t[0];
+  document.getElementById('topbar-sub').textContent = t[1];
+  
+  // Close notifications
+  document.getElementById('notifDropdown').classList.remove('open');
+  
+  if (pageId === 'analytics') {
+    setTimeout(buildHeatmap, 50);
+  }
+}
+
+function switchYearTab(el, year) {
+  document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── QUESTIONS DATA ───────────────────────────────────
+const questions=[
+  {q:1,topic:"Determinants",        correct:35,wrong:3, pct:92},
+  {q:2,topic:"Rotation Matrix",     correct:3, wrong:35,pct:8,alert:true},
+  {q:3,topic:"Integration",         correct:31,wrong:7, pct:82},
+  {q:4,topic:"Matrix Inverse",      correct:28,wrong:10,pct:74},
+  {q:5,topic:"Product Rule",        correct:24,wrong:14,pct:63},
+  {q:6,topic:"Chain Rule",          correct:21,wrong:17,pct:55},
+  {q:7,topic:"Gaussian Elim.",      correct:30,wrong:8, pct:79},
+  {q:8,topic:"Eigenvalues",         correct:9, wrong:29,pct:24},
+  {q:9,topic:"Definite Integrals",  correct:29,wrong:9, pct:76},
+  {q:10,topic:"Critical Points",    correct:22,wrong:16,pct:58},
+];
+
+// ─── HEATMAP DATA ─────────────────────────────────────
+const htStudents=['Alice','Brian','Carla','Derek','Emma','Felix','Grace','Hector','Jin','Sara','Carlos','Priya','Leo','Aisha','Marcus'];
+const htTopics=['Determinants','Matrix Add.','Rot. Matrix','Mat. Inverse','Product Rule','Chain Rule','Gauss. Elim.','Eigenvalues','Def. Integrals','Crit. Points'];
+
+// Row index 5 = Felix (most red/urgent row)
+const htData=[
+  [95,90,80,88,85,78,88,72,82,88],  // Alice
+  [88,72,22,45,55,48,70,18,62,50],  // Brian
+  [85,80,38,75,68,72,82,30,74,70],  // Carla
+  [60,55,20,18,40,30,52,12,72,45],  // Derek
+  [98,95,90,92,88,92,96,80,90,87],  // Emma
+  [35,28,8,10,22,15,40,5,20,30],    // Felix ← URGENT ROW (all red)
+  [92,85,70,80,75,80,88,55,82,78],  // Grace
+  [80,68,25,30,58,55,65,20,70,52],  // Hector
+  [78,82,42,65,60,55,72,28,68,60],  // Jin
+  [88,78,55,72,70,65,80,40,76,72],  // Sara
+  [65,58,32,28,45,40,55,15,62,48],  // Carlos
+  [90,85,78,82,80,85,88,62,84,80],  // Priya
+  [55,48,18,22,35,28,50,10,45,38],  // Leo
+  [94,90,82,86,85,88,92,68,88,84],  // Aisha
+  [76,70,38,55,60,52,68,25,65,58],  // Marcus
+];
+
+// Notes for tooltips
+const htNotes={
+  'Brian-Rot. Matrix':'Wrote [[cosθ,sinθ],[sinθ,cosθ]] — missing the −sinθ sign.',
+  'Derek-Rot. Matrix':'Both signs flipped — confused rotation with its transpose.',
+  'Felix-Rot. Matrix':'Wrote symmetric form — no geometric intuition. Scored 8%.',
+  'Felix-Mat. Inverse':'Left blank. Fundamental concept entirely missing.',
+  'Felix-Eigenvalues':'Left blank — no attempt on eigenvalue section.',
+  'Felix-Def. Integrals':'Differentiated instead of integrating. Conceptual confusion.',
+  'Felix-Matrix Add.':'Below class average. Basic operations need review.',
+  'Emma-Eigenvalues':'Best eigenvector answer in class — showed full derivation.',
+  'Carla-Rot. Matrix':'Mixed up row/column order — confused rotation with reflection.',
+  'Hector-Rot. Matrix':'Same sign error as majority. Consistent with class-wide pattern.',
+  'Leo-Eigenvalues':'Left blank on eigenvalue section.',
+  'Carlos-Mat. Inverse':'Score 28% — applies element-wise inversion (incorrect method).',
+};
+
+function cellColor(v){
+  if(v>=80)return{bg:`rgba(16,185,129,${.22+v/100*.58})`,tx:'#064e3b'};
+  if(v>=60)return{bg:`rgba(245,158,11,${.22+v/100*.48})`,tx:'#78350f'};
+  if(v>=40)return{bg:`rgba(249,115,22,${.25+v/100*.4})`,tx:'#7c2d12'};
+  return{bg:`rgba(239,68,68,${.28+(100-v)/100*.5})`,tx:'#7f1d1d'};
+}
+
+const URGENT_ROWS = [5]; // Felix row index
+
+function buildHeatmap(){
+  const root=document.getElementById('heatmapRoot');
+  if(!root)return;
+  const lw=78,cw=58,g=3;
+  const cols=`${lw}px repeat(10,${cw}px)`;
+  let h=`<div style="display:inline-grid;grid-template-columns:${cols};gap:${g}px;min-width:${lw+(cw+g)*10+20}px">`;
+
+  // Header
+  h+=`<div></div>`;
+  htTopics.forEach(t=>h+=`<div style="font-size:8.5px;font-weight:800;color:#94a3b8;text-align:center;padding-bottom:5px;white-space:normal;line-height:1.1;height:26px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden" title="${t}">${t}</div>`);
+
+  // Rows
+  htData.forEach((row,si)=>{
+    const isUrgent=URGENT_ROWS.includes(si);
+    const rowStyle=isUrgent?'background:rgba(251,191,36,0.12);border-radius:7px;outline:2px solid #fbbf24;outline-offset:1px;':'';
+
+    // Name cell
+    if(isUrgent){
+      h+=`<div style="font-size:9.5px;color:#b45309;font-weight:800;display:flex;align-items:center;gap:4px;padding:0 3px;${rowStyle}"><span style="font-size:11px">⚠</span>${htStudents[si]}</div>`;
+    } else {
+      h+=`<div style="font-size:9.5px;color:#64748b;font-weight:700;display:flex;align-items:center;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${htStudents[si]}">${htStudents[si]}</div>`;
+    }
+
+    row.forEach((v,ti)=>{
+      const c=cellColor(v);
+      const key=`${htStudents[si]}-${htTopics[ti]}`;
+      const hasNote=!!htNotes[key];
+      const urgentCell=isUrgent?';box-shadow:inset 0 0 0 1.5px rgba(251,191,36,0.4)':'';
+      h+=`<div class="heat-cell"
+        style="background:${c.bg};color:${c.tx}${urgentCell}"
+        onmouseenter="showTip(event,'${htStudents[si]}','${htTopics[ti]}',${v},${isUrgent})"
+        onmouseleave="hideTip()"
+      >${v}${hasNote?`<span style="position:absolute;top:1px;right:2px;font-size:6px;color:rgba(99,102,241,0.85)">●</span>`:''}</div>`;
+    });
+  });
+
+  h+='</div>';
+  root.innerHTML=h;
+}
+
+// Tooltip
+const tip=document.getElementById('heatTip');
+function showTip(e,student,topic,val,isUrgent){
+  const col=val>=80?'#10b981':val>=60?'#f59e0b':val>=40?'#f97316':'#ef4444';
+  const lbl=val>=80?'Strong':val>=60?'Adequate':val>=40?'Struggling':'Critical';
+  const note=htNotes[`${student}-${topic}`]||`${student} scored ${val}% on ${topic}.`;
+  const urgentTag=isUrgent?`<div style="background:#fef3c7;color:#b45309;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;margin-bottom:6px;display:inline-block">⚠ Urgent Row — Intervention Needed</div><br/>`:'';
+  tip.innerHTML=`${urgentTag}<div style="font-weight:900;font-size:13px;color:#fff;margin-bottom:3px">${student}</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">${topic} &nbsp;·&nbsp; <span style="color:${col};font-weight:900">${val}% — ${lbl}</span></div>
+    <div style="background:rgba(255,255,255,0.1);border-radius:3px;height:5px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:${val}%;background:${col};border-radius:3px"></div></div>
+    <div style="font-size:11px;color:#cbd5e1;line-height:1.55">${note}</div>`;
+  tip.classList.add('show');
+  posTip(e);
+}
+function hideTip(){tip.classList.remove('show')}
+function posTip(e){
+  const tw=tip.offsetWidth||220,th=tip.offsetHeight||90;
+  let x=e.clientX+14,y=e.clientY-th/2;
+  if(x+tw>window.innerWidth-8)x=e.clientX-tw-10;
+  if(y<6)y=6;
+  if(y+th>window.innerHeight-6)y=window.innerHeight-th-6;
+  tip.style.left=x+'px';tip.style.top=y+'px';
+}
+document.addEventListener('mousemove',e=>{if(tip.classList.contains('show'))posTip(e)});
+
+// ─── NOTIF ────────────────────────────────────────────
+function toggleNotif(e){e.stopPropagation();document.getElementById('notifDropdown').classList.toggle('open')}
+
+// ─── EXAM MODAL ───────────────────────────────────────
+function openExamModal(){
+  document.getElementById('notifDropdown').classList.remove('open');
+  document.getElementById('examModal').classList.add('open');
+  renderDist();renderScatter();renderQTable();
+  switchTab('exam');
+}
+function closeExamModal(e){if(e.target===document.getElementById('examModal'))closeExamModalBtn()}
+function closeExamModalBtn(){document.getElementById('examModal').classList.remove('open')}
+
+function switchTab(tab){
+  const isRisk=tab==='risk';
+  document.getElementById('examPanel').style.display=isRisk?'none':'block';
+  document.getElementById('riskPanel').style.display=isRisk?'block':'none';
+  const te=document.getElementById('tabExam'),tr=document.getElementById('tabRisk');
+  te.className='modal-tab'+(isRisk?'':' active-blue');
+  tr.className='modal-tab tab-red'+(isRisk?' active-red':'');
+}
+
+function renderDist(){
+  const c=document.getElementById('distContainer');
+  const mx=Math.max(...questions.map(q=>q.wrong));
+  let h='<div style="display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-bottom:8px">';
+  questions.forEach(q=>{
+    const ht=Math.max(6,(q.wrong/mx)*76);
+    const isA=q.alert;
+    const col=isA?'#ef4444':q.wrong<=8?'#10b981':q.wrong<=18?'#f59e0b':'#f97316';
+    h+=`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:${isA?'pointer':'default'}" ${isA?'onclick="openStudentPopup()"':''}>
+      <div style="height:96px;display:flex;align-items:flex-end;width:100%;justify-content:center;position:relative">
+        ${isA?`<div style="position:absolute;top:0;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;font-size:9px;font-weight:900;padding:2px 5px;border-radius:4px;white-space:nowrap;animation:alert-pulse 2s infinite">⚠ ${q.wrong}!</div>`:''}
+        <div style="width:82%;height:${ht}px;border-radius:4px 4px 0 0;background:${col};${isA?'box-shadow:0 0 14px rgba(239,68,68,0.45)':''}"></div>
+      </div>
+      <div style="font-size:10px;font-weight:900;color:#64748b">Q${q.q}</div>
+      <div style="font-size:10px;font-weight:900;color:${col}">${q.wrong}✗</div>
+    </div>`;
+  });
+  h+='</div>';
+  c.innerHTML=h;
+}
+
+function renderScatter(){
+  const svg=document.getElementById('scatterPoints');
+  const xs=[40,69,98,127,156,185,214,243,272,301];
+  let h='';
+  questions.forEach((q,qi)=>{
+    const x=xs[qi],base=160-(q.pct/100*150);
+    if(q.alert){
+      h+=`<g class="alert-pt" onclick="openStudentPopup()" style="cursor:pointer">
+        <circle cx="${x}" cy="${base}" r="9" fill="#ef4444" opacity="0.15"/>
+        <circle cx="${x}" cy="${base}" r="5.5" fill="#ef4444"/>
+        <text x="${x}" y="${base+1}" text-anchor="middle" dominant-baseline="middle" font-size="7" font-weight="900" fill="#fff">!</text>
+      </g>`;
+    } else {
+      const col=q.pct>=80?'#10b981':q.pct>=55?'#f59e0b':'#f97316';
+      for(let i=0;i<5;i++){
+        const jx=x+(Math.random()-.5)*16,jy=Math.min(155,Math.max(12,base+(Math.random()-.5)*28));
+        h+=`<circle cx="${jx}" cy="${jy}" r="3.5" fill="${col}" opacity="0.7"/>`;
+      }
+    }
+  });
+  svg.innerHTML=h;
+}
+
+function renderQTable(){
+  document.getElementById('qTableBody').innerHTML=questions.map(q=>`
+    <tr style="cursor:${q.alert?'pointer':''};background:${q.alert?'#fff5f5':''}" ${q.alert?'onclick="openStudentPopup()"':''}>
+      <td style="font-weight:900;color:${q.alert?'#dc2626':''}">${q.alert?'⚠ ':''}Q${q.q}</td>
+      <td style="color:#64748b;font-size:12px">${q.topic}</td>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-weight:900;font-size:12px;color:${q.pct>=80?'#059669':q.pct>=55?'#b45309':'#dc2626'}">${q.pct}%</span></td>
+      <td>${q.alert?'<span class="pill red" style="font-size:10px;cursor:pointer">Drill →</span>':''}</td>
+    </tr>`).join('');
+}
+
+function openStudentPopup(){document.getElementById('studentPopup').classList.add('open')}
+function closeStudentPopup(e){if(e.target===document.getElementById('studentPopup'))document.getElementById('studentPopup').classList.remove('open')}
+
+// ─── CHAT ─────────────────────────────────────────────
+const chatThreads={
+  'Felix Novak':{id:'felix',initials:'FN',course:'ROB 501',messages:[{from:'student',text:'Hi Dr. Rodriguez — I have a question about rotation matrices. I keep getting confused about the signs.'}],draft:''},
+  'Derek Liu':{id:'derek',initials:'DL',course:'ROB 501',messages:[],draft:''}
+};
+let activeThread='Felix Novak';
+
+function escapeHTML(str){return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+function prepopulatedMessage(student){
+  if(student==='Felix Novak')return `Hi Felix — I noticed you're struggling with rotation matrices and eigenvalues on the midterm. I'd love to help you get back on track.\n\nCan we set up 30 minutes of office hours this week? Come prepared with one problem that's confusing you and we'll work through it together.`;
+  return `Hi Derek — Your calculus is showing real improvement! But I can see linear algebra is still a challenge.\n\nLet's set up some office hours to work through matrix inverse and eigenvalue problems before the final. When works best for you this week?`;
+}
+
+function renderChatTray(){
+  const list=document.getElementById('chatTrayList');
+  list.innerHTML=Object.keys(chatThreads).map(name=>{
+    const t=chatThreads[name];
+    const last=t.messages[t.messages.length-1];
+    const preview=last?(last.from==='teacher'?'You: ':'')+( last.text||'Sent a resource'):'No messages yet';
+    return `<div class="chat-thread" onclick="openChat('${name}')">
+      <div class="chat-av">${t.initials}</div>
+      <div class="chat-thread-body">
+        <div class="chat-thread-name">${name}</div>
+        <div class="chat-thread-preview">${escapeHTML(preview)}</div>
+        <div class="chat-thread-meta">${t.course}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleChatTray(){document.getElementById('chatTray').classList.toggle('open');renderChatTray()}
+function closeChatTray(){document.getElementById('chatTray').classList.remove('open')}
+function closeChatWindow(){document.getElementById('chatWindow').classList.remove('open')}
+
+function openChat(name){
+  activeThread=name;
+  closeChatTray();
+  const w=document.getElementById('chatWindow');
+  w.classList.add('open');
+  const t=chatThreads[name];
+  document.getElementById('chatHdrAv').textContent=t.initials;
+  document.getElementById('chatHdrName').textContent=name;
+  const input=document.getElementById('chatInput');
+  if(!t.draft)t.draft=prepopulatedMessage(name);
+  input.value=t.draft;
+  renderMessages();
+  setTimeout(()=>{document.getElementById('chatMsgs').scrollTop=document.getElementById('chatMsgs').scrollHeight},10);
+}
+
+function renderMessages(){
+  const t=chatThreads[activeThread];
+  const box=document.getElementById('chatMsgs');
+  let html='';
+  t.messages.forEach(m=>{
+    const rc=m.from==='teacher'?'teacher':'student';
+    const content=m.html?m.html:escapeHTML(m.text||'');
+    html+=`<div class="msg-row ${rc}"><div style="display:flex;flex-direction:column;align-items:${m.from==='teacher'?'flex-end':'flex-start'}"><div class="msg-bubble ${rc}">${content}</div>${m.status==='sent'?`<div class="msg-meta">Sent</div>`:''}</div></div>`;
+  });
+  box.innerHTML=html||`<div style="color:#94a3b8;font-size:12px;padding:8px 2px">No messages yet. Send a check-in to start the conversation.</div>`;
+}
+
+function sendChat(){
+  const input=document.getElementById('chatInput');
+  const text=(input.value||'').trim();
+  if(!text)return;
+  chatThreads[activeThread].messages.push({from:'teacher',text,status:'sent'});
+  chatThreads[activeThread].draft='';
+  input.value='';
+  renderMessages();
+  document.getElementById('chatMsgs').scrollTop=document.getElementById('chatMsgs').scrollHeight;
+}
+
+document.addEventListener('input',e=>{
+  if(e.target&&e.target.id==='chatInput')chatThreads[activeThread].draft=e.target.value;
+});
+
+document.addEventListener('click',e=>{
+  const nd=document.getElementById('notifDropdown');
+  const bell=document.getElementById('bellBtn');
+  if(nd&&!nd.contains(e.target)&&bell&&!bell.contains(e.target))nd.classList.remove('open');
+  const tray=document.getElementById('chatTray');
+  const fab=document.getElementById('chatFab');
+  if(tray&&tray.classList.contains('open')&&!tray.contains(e.target)&&fab&&!fab.contains(e.target))tray.classList.remove('open');
+});
+
+// ─── INIT ─────────────────────────────────────────────
+renderChatTray();
+showPage('home');
+</script>
+</body>
+</html>
